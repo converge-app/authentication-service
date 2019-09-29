@@ -1,15 +1,15 @@
 #!/bin/bash
 
 TAG=$(date +%s)
-SERVICE_NAME="users-service"
+SERVICE_NAME="authentication-service"
 ORGANISATION="converge"
 DOCKER_IMAGE="$ORGANISATION/$SERVICE_NAME:$TAG"
 
 docker build . -t "$DOCKER_IMAGE"
 
-docker run --rm --name users-service \
+docker run --rm --name authentication-service \
 -e ELASTICSEARCH_URI="http://localhost:9200" \
--e CollectionName="Users" \
+-e CollectionName="Authentication" \
 -e ConnectionString="mongodb://localhost:27017" \
 -e DatabaseName="ApplicationDb" \
 -e MONGO_INITDB_ROOT_USERNAME="application" \

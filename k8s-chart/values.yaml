@@ -1,7 +1,7 @@
 web:
   port: 80
   mongodb:
-    serviceName: "users-service-master-mongodb"
+    serviceName: "authentication-service-master-mongodb"
     port: "27017"
 
 mongodb:

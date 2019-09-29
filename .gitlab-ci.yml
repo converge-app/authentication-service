@@ -8,13 +8,13 @@ stages:
   - deploy
 
 variables:
-  IMAGE: ${CI_REGISTRY_IMAGE}/users-service:${CI_COMMIT_REF_SLUG}
+  IMAGE: ${CI_REGISTRY_IMAGE}/authentication-service:${CI_COMMIT_REF_SLUG}
   GKE_SERVICE_ACCOUNT: base64-encoded-json-service-account-file-from-gke
   GKE_CLUSTER_NAME: converge-cluster
   GKE_ZONE: europe-west3-a
   GKE_PROJECT: converge-252922
-  URL_REVIEW: users-service.api.${CI_COMMIT_REF_SLUG}.converge-app.net
-  URL_PRODUCTION: users-service.api.converge-app.net
+  URL_REVIEW: authentication-service.api.${CI_COMMIT_REF_SLUG}.converge-app.net
+  URL_PRODUCTION: authentication-service.api.converge-app.net
 
 build:
   stage: build
@@ -31,12 +31,12 @@ deploy_review:
     - init_helm
     - helm upgrade
       --install
-      --set web.name="users-service-${CI_COMMIT_REF_SLUG}"
+      --set web.name=authentication-service-${CI_COMMIT_REF_SLUG}"
       --set web.image="${IMAGE}"
       --set web.host="${URL_REVIEW}"
       --wait
       --force
-      users-service-${CI_COMMIT_REF_SLUG}
+      authentication-service-${CI_COMMIT_REF_SLUG}
       ./k8s-chart
   except:
     refs:
@@ -49,12 +49,12 @@ deploy_production:
     - init_helm
     - helm upgrade
       --install
-      --set web.name="users-service-${CI_COMMIT_REF_SLUG}"
+      --set web.name="authentication-service-${CI_COMMIT_REF_SLUG}"
       --set web.image="${IMAGE}"
       --set web.host="${URL_PRODUCTION}"
       --wait
       --force
-      users-service-${CI_COMMIT_REF_SLUG}
+      authentication-service-${CI_COMMIT_REF_SLUG}
       ./k8s-chart
   only:
     refs:
