@@ -14,7 +14,7 @@ namespace Application.Services
 {
     public interface IUserService
     {
-        User Authenticate(string username, string password);
+        User Authenticate(string id, string password);
         User Create(User user, string password);
         void Update(User userParam, string password = null);
     }
@@ -28,15 +28,15 @@ namespace Application.Services
             _userRepository = userRepository;
         }
 
-        public User Authenticate(string username, string password)
+        public User Authenticate(string id, string password)
         {
-            if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
+            if (id == string.Empty || string.IsNullOrEmpty(password))
                 return null;
 
-            var user = _userRepository.GetByUsername(username) ??
+            var user = _userRepository.GetById(id) ??
                        throw new ArgumentNullException("_userRepository.GetByUsername(username)");
 
-            if (!VerifyPasswordHash(password, user.PasswordHash, user.PasswordSalt))
+            if (!VerifyPasswordHash(password, user.CurrentPassword))
                 return null;
 
             return user;
@@ -47,13 +47,12 @@ namespace Application.Services
             if (string.IsNullOrWhiteSpace(password)) // TODO: set proper rules
                 throw new Exception("Password is required");
 
-            if (_userRepository.GetByUsername(user.Username) != null)
-                throw new Exception("Username is already taken");
+            if (_userRepository.GetById(user.Id) != null)
+                throw new Exception("username i already taken");
 
-            CreatePasswordHash(password, out var passwordHash, out var passwordSalt);
+            CreatePasswordHash(password, out var passwordHash);
 
-            user.PasswordHash = passwordHash;
-            user.PasswordSalt = passwordSalt;
+            user.CurrentPassword = passwordHash;
 
             return _userRepository.Create(user);
         }
@@ -63,34 +62,28 @@ namespace Application.Services
             var user = _userRepository.GetById(userParam.Id) ??
                        throw new ArgumentNullException("_userRepository.GetById(userParam.Id)");
 
-            if (userParam.Username != user.Username)
-                if (_userRepository.GetByUsername(userParam.Username) != null)
+            if (userParam.Id != user.Id)
+                if (_userRepository.GetById(userParam.Id) != null)
                     throw new Exception("Username was already taken");
-
-            user.FirstName = userParam.FirstName;
-            user.LastName = userParam.LastName;
-            user.Username = userParam.Username;
 
             if (!string.IsNullOrWhiteSpace(password))
             {
-                CreatePasswordHash(password, out var passwordHash, out var passwordSalt);
+                CreatePasswordHash(password, out var passwordHash);
 
-                user.PasswordHash = passwordHash;
-                user.PasswordSalt = passwordSalt;
+                user.CurrentPassword = passwordHash;
             }
 
             _userRepository.Update(user.Id, user);
         }
 
-        private static void CreatePasswordHash(string password, out string passwordHash, out string passwordSalt)
+        private static void CreatePasswordHash(string password, out string passwordHash)
         {
             if (string.IsNullOrWhiteSpace(password))
                 throw new Exception("Password is missing");
 
             try
             {
-                passwordSalt = BCrypt.Net.BCrypt.GenerateSalt();
-                passwordHash = BCrypt.Net.BCrypt.HashPassword(password, passwordSalt);
+                passwordHash = BCrypt.Net.BCrypt.HashPassword(password);
             }
             catch (Exception e)
             {
@@ -99,14 +92,12 @@ namespace Application.Services
             }
         }
 
-        private static bool VerifyPasswordHash(string password, string storedHash, string storedSalt)
+        private static bool VerifyPasswordHash(string password, string storedHash)
         {
             if (string.IsNullOrWhiteSpace(password))
                 throw new Exception("Password is null or whitespace");
             if (string.IsNullOrWhiteSpace(storedHash))
                 throw new Exception("Stored hash is null or whitespace");
-            if (string.IsNullOrWhiteSpace(storedSalt))
-                throw new Exception("Stored salt is null or whitespace");
 
             try
             {

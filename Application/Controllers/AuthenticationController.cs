@@ -19,14 +19,14 @@ namespace Application.Controllers
 {
     [Authorize]
     [Route("api/[controller]")]
-    public class UsersController : ControllerBase
+    public class AuthenticationController : ControllerBase
     {
         private readonly IUserService _userService;
         private readonly IUserRepository _userRepository;
         private readonly IMapper _mapper;
         private AppSettings _appSettings;
 
-        public UsersController(IUserService userService, IUserRepository userRepository, IMapper mapper,
+        public AuthenticationController(IUserService userService, IUserRepository userRepository, IMapper mapper,
             IOptions<AppSettings> appSettings)
         {
             _userService = userService;
@@ -39,7 +39,7 @@ namespace Application.Controllers
         [HttpPost("authenticate")]
         public IActionResult Authenticate([FromBody] UserAuthenticationDto userDto)
         {
-            var user = _userService.Authenticate(userDto.Username, userDto.Password);
+            var user = _userService.Authenticate(userDto.Id, userDto.Password);
 
             if (user == null)
                 return BadRequest(new {message = "Username or password is incorrect"});
@@ -115,7 +115,7 @@ namespace Application.Controllers
                 return BadRequest(new {Message = e.Message});
             }
         }
-
+        
         [HttpDelete("{id}")]
         public IActionResult Delete(string id)
         {

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Application.Database;
 using Application.Models.Entities;
@@ -9,7 +10,6 @@ namespace Application.Repositories
     {
         List<User> Get();
         User GetById(string id);
-        User GetByUsername(string username);
         User Create(User user);
         void Update(string id, User userIn);
         void Remove(User userIn);
@@ -37,20 +37,24 @@ namespace Application.Repositories
             return _users.Find<User>(user => user.Id == id).FirstOrDefault();
         }
 
-        public User GetByUsername(string username)
-        {
-            return _users.Find<User>(user => user.Username == username).FirstOrDefault();
-        }
-
         public User Create(User user)
         {
+            user.Passwords.Add(user.CurrentPassword);
             _users.InsertOne(user);
             return user;
         }
 
         public void Update(string id, User userIn)
         {
-            _users.ReplaceOne(user => user.Id == id, userIn);
+            if (userIn.Passwords.Contains(userIn.CurrentPassword))
+            {
+                userIn.Passwords.Add(userIn.CurrentPassword);
+                _users.ReplaceOne(user => user.Id == id, userIn);
+            }
+            else
+            {
+                throw new Exception("Password was used previously");
+            }
         }
 
         public void Remove(User userIn)
