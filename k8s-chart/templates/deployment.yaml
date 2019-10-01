@@ -43,6 +43,8 @@ spec:
               value: "6831"
             - name: JAEGER_SAMPLER_TYPE
               value: "const"
+            - name: USERS_SERVICE_HTTP
+              value: users-service-master
           ports:
             - containerPort: {{ .Values.web.port }}
           resources:

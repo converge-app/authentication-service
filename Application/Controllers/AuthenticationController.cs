@@ -2,9 +2,12 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
 using System.Security.Claims;
 using System.Text;
+using System.Threading.Tasks;
 using Application.Helpers;
+using Application.Models;
 using Application.Models.DataTransferObjects;
 using Application.Models.Entities;
 using Application.Repositories;
@@ -39,7 +42,10 @@ namespace Application.Controllers
         [HttpPost("authenticate")]
         public IActionResult Authenticate([FromBody] UserAuthenticationDto userDto)
         {
-            var user = _userService.Authenticate(userDto.Id, userDto.Password);
+            if (!ModelState.IsValid)
+                return BadRequest(new { Message = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage) });
+            
+            var user = _userService.Authenticate(userDto.Email, userDto.Password);
 
             if (user == null)
                 return BadRequest(new {message = "Username or password is incorrect"});
@@ -69,26 +75,23 @@ namespace Application.Controllers
 
         [AllowAnonymous]
         [HttpPost("register")]
-        public IActionResult Register([FromBody] UserRegistrationDto userDto)
+        public async Task<IActionResult> Register([FromBody] UserRegistrationDto userDto)
         {
             var user = _mapper.Map<User>(userDto);
 
             try
             {
-                return Ok(_userService.Create(user, userDto.Password));
+                string id = await _userService.RegisterUser(userDto.Email, userDto.FirstName, userDto.LastName);
+                user.Id = id;
+
+                var createdUser = _userService.Create(user, userDto.Password);
+                var createdUserDto = _mapper.Map<UserRegisteredDto>(createdUser);
+                return Ok(createdUserDto);
             }
             catch (Exception e)
             {
-                return BadRequest(new {Message = e.Message});
+                return BadRequest(new MessageObj(e.Message));
             }
-        }
-
-        [HttpGet]
-        public IActionResult GetAll()
-        {
-            var users = _userRepository.Get();
-            var userDtos = _mapper.Map<IList<UserDto>>(users);
-            return Ok(userDtos);
         }
 
         [HttpGet("{id}")]

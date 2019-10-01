@@ -21,6 +21,7 @@ using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using OpenTracing;
 using OpenTracing.Util;
+using Polly;
 using Prometheus;
 using Serilog;
 using Serilog.Events;
@@ -79,6 +80,14 @@ namespace Application
 
             var appSettings = appSettingsSection.Get<AppSettings>();
             var key = Encoding.ASCII.GetBytes(appSettings.Secret);
+            
+            services.AddHttpClient<IUserService, UserService>("UserService")
+                .AddTransientHttpErrorPolicy(
+                    p => p.WaitAndRetryAsync(
+                        3, _ => TimeSpan.FromMilliseconds(600)
+                        )
+                    );
+            
             services.AddAuthentication(x =>
                 {
                     x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;

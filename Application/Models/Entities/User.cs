@@ -10,7 +10,9 @@ namespace Application.Models.Entities
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
         public string Id { get; set; }
+
+        public string Email { get; set; }
         public string CurrentPassword { get; set; }
-        public List<string> Passwords { get; set; }
+        public List<string> Passwords { get; set; } = new List<string>();
     }
 }

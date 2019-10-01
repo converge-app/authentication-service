@@ -14,6 +14,7 @@ namespace Application.Repositories
         void Update(string id, User userIn);
         void Remove(User userIn);
         void Remove(string id);
+        User GetByEmail(string email);
     }
 
     public class UserRepository : IUserRepository
@@ -35,6 +36,11 @@ namespace Application.Repositories
         public User GetById(string id)
         {
             return _users.Find<User>(user => user.Id == id).FirstOrDefault();
+        }
+
+        public User GetByEmail(string email)
+        {
+            return _users.Find(user => user.Email == email).FirstOrDefault();
         }
 
         public User Create(User user)
