@@ -15,6 +15,7 @@ variables:
   GKE_PROJECT: converge-252922
   URL_REVIEW: authentication-service.api.${CI_COMMIT_REF_SLUG}.converge-app.net
   URL_PRODUCTION: authentication-service.api.converge-app.net
+  GIT_SUBMODULE_STRATEGY: recursive
 
 build:
   stage: build
