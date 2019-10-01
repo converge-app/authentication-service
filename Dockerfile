@@ -1,21 +1,20 @@
-FROM mcr.microsoft.com/dotnet/core/sdk:2.2-alpine AS builder
+FROM mcr.microsoft.com/dotnet/core/sdk:2.2-alpine AS build
 WORKDIR /app
 
-# caches restore result by copying csproj file separately
-COPY Application/*.csproj .
+# copy csproj and restore as distinct layers
+COPY *.sln .
+COPY Application/*.csproj ./Application/
+COPY ApplicationUnitTests/*.csproj ./ApplicationUnitTests/
+COPY lib/utility/Application.Utility/*.csproj lib/utility/Application.Utility/
 RUN dotnet restore
 
-COPY . .
-RUN dotnet publish --output /app/ --configuration Release
-RUN sed -n 's:.*<AssemblyName>\(.*\)</AssemblyName>.*:\1:p' *.csproj > __assemblyname
-RUN if [ ! -s __assemblyname ]; then filename=$(ls *.csproj); echo ${filename%.*} > __assemblyname; fi
+# copy everything else and build app
+COPY /. ./Application/
+WORKDIR /app/Application
+RUN dotnet publish -c Release -o out
 
-# Stage 2
+
 FROM mcr.microsoft.com/dotnet/core/aspnet:2.2-alpine AS runtime
 WORKDIR /app
-COPY --from=builder /app .
-
-ENV PORT 80
-EXPOSE 80
-
-ENTRYPOINT dotnet $(cat /app/__assemblyname).dll
+COPY --from=build /app/Application/Application/out ./
+ENTRYPOINT ["dotnet", "Application.dll"]
