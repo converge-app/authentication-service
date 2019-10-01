@@ -1,4 +1,5 @@
 using System;
+using Application.Utility.Exception;
 using Microsoft.Extensions.Configuration;
 using MongoDB.Driver;
 

@@ -11,6 +11,7 @@ using Application.Models;
 using Application.Models.DataTransferObjects;
 using Application.Models.Entities;
 using Application.Repositories;
+using Application.Utility.Models;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
