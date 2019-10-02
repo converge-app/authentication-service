@@ -1,5 +1,6 @@
 using Application.Models;
 using Application.Models.Entities;
+using Application.Utility.Database;
 using MongoDB.Driver;
 
 namespace Application.Database

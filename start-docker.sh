@@ -14,8 +14,10 @@ docker run --rm --name authentication-service \
 -e DatabaseName="ApplicationDb" \
 -e MONGO_INITDB_ROOT_USERNAME="application" \
 -e MONGO_INITDB_ROOT_PASSWORD="password" \
+-e MONGO_SERVICE_NAME="localhost" \
+-e MONGO_SERVICE_PORT="27017" \
 -e JAEGER_AGENT_HOST="localhost" \
 -e JAEGER_AGENT_PORT="6831" \
 -e JAEGER_SAMPLER_TYPE="const" \
--p 80:80 \
+-p 8080:80 \
 "$DOCKER_IMAGE"

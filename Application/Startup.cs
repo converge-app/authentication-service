@@ -43,7 +43,7 @@ namespace Application
                     options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
                 });
 
-            services.AddSingleton<Application.Utility.Database.IDatabaseSettings, Application.Utility.Database.DatabaseSettings>();
+            services.AddSingleton<IDatabaseSettings, DatabaseSettings>();
             services.AddTransient<IDatabaseContext, DatabaseContext>();
             services.AddMongoDb();
             services.AddAutoMapper(typeof(AutoMapperProfile));
