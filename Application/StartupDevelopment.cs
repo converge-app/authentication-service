@@ -67,7 +67,7 @@ namespace Application
 
             services.AddMultipleDomainSupport();
 
-            services.AddHttpClient<IUserService, UserService>("UserService")
+            services.AddHttpClient<IAuthenticationService, AuthenticationService>("UserService")
                 .AddTransientHttpErrorPolicy(
                     p => p.WaitAndRetryAsync(
                         3, _ => TimeSpan.FromMilliseconds(600)
@@ -90,7 +90,7 @@ namespace Application
                         OnTokenValidated = context =>
                         {
                             var userRepository =
-                                context.HttpContext.RequestServices.GetRequiredService<IUserRepository>();
+                                context.HttpContext.RequestServices.GetRequiredService<IAuthenticationRepository>();
                             var userId = context.Principal.Identity.Name;
                             var user = userRepository.GetById(userId);
                             if (user == null) context.Fail("Unauthorized");
@@ -110,8 +110,8 @@ namespace Application
                     };
                 });
 
-            services.AddScoped<IUserRepository, UserRepository>();
-            services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IAuthenticationRepository, AuthenticationRepository>();
+            services.AddScoped<IAuthenticationService, AuthenticationService>();
 
             services.AddApiDocumentation("Authentication");
 

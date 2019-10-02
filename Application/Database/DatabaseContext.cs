@@ -6,7 +6,7 @@ namespace Application.Database
 {
     public interface IDatabaseContext
     {
-        IMongoCollection<User> Users { get; }
+        IMongoCollection<AuthUser> Users { get; }
 
         bool IsConnectionOpen();
     }
@@ -22,7 +22,7 @@ namespace Application.Database
             _database = client.GetDatabase(settings.DatabaseName);
         }
 
-        public IMongoCollection<User> Users => _database.GetCollection<User>("Users");
+        public IMongoCollection<AuthUser> Users => _database.GetCollection<AuthUser>("Users");
 
         public bool IsConnectionOpen()
         {

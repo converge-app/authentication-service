@@ -1,43 +1,33 @@
 using System;
-using System.Collections.Generic;
-using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 using System.Net.Http;
-using System.Security.Claims;
-using System.Text;
 using System.Threading.Tasks;
-using Application.Helpers;
-using Application.Models;
 using Application.Models.DataTransferObjects;
 using Application.Models.Entities;
 using Application.Repositories;
 using Application.Utility.Models;
-using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
-using Newtonsoft.Json;
 
 namespace Application.Services
 {
-    public interface IUserService
+    public interface IAuthenticationService
     {
-        User Authenticate(string email, string password);
-        User Create(User user, string password);
-        void Update(User userParam, string password = null);
+        AuthUser Authenticate(string email, string password);
+        AuthUser Create(AuthUser user, string password);
+        void Update(AuthUser userParam, string password = null);
         Task<string> RegisterUser(string email, string firstName, string lastName);
     }
 
-    public class UserService : IUserService
+    public class AuthenticationService : IAuthenticationService
     {
-        private readonly IUserRepository _userRepository;
+        private readonly IAuthenticationRepository _userRepository;
         private readonly IHttpClientFactory _httpClientFactory;
 
-        public UserService(IUserRepository userRepository, IHttpClientFactory httpClientFactory)
+        public AuthenticationService(IAuthenticationRepository authenticationRepository, IHttpClientFactory httpClientFactory)
         {
-            _userRepository = userRepository;
+            _userRepository = authenticationRepository;
             _httpClientFactory = httpClientFactory;
         }
 
-        public User Authenticate(string email, string password)
+        public AuthUser Authenticate(string email, string password)
         {
             if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
                 return null;
@@ -51,7 +41,7 @@ namespace Application.Services
             return user;
         }
 
-        public User Create(User user, string password)
+        public AuthUser Create(AuthUser user, string password)
         {
             if (string.IsNullOrWhiteSpace(password)) // TODO: set proper rules
                 throw new Exception("Password is required");
@@ -66,7 +56,7 @@ namespace Application.Services
             return _userRepository.Create(user);
         }
 
-        public void Update(User userParam, string password = null)
+        public void Update(AuthUser userParam, string password = null)
         {
             var user = _userRepository.GetById(userParam.Id) ??
                        throw new ArgumentNullException("_userRepository.GetById(userParam.Id)");

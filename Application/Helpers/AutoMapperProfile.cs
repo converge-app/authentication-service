@@ -8,14 +8,14 @@ namespace Application.Helpers
     {
         public AutoMapperProfile()
         {
-            CreateMap<User, UserDto>();
-            CreateMap<UserDto, User>();
-            CreateMap<UserUpdateDto, User>();
-            CreateMap<UserRegisteredDto, User>();
-            CreateMap<User, UserRegisteredDto>();
-            CreateMap<UserRegistrationDto, User>();
-            CreateMap<UserAuthenticationDto, User>();
-            CreateMap<User, UserAuthenticatedDto>();
+            CreateMap<AuthUser, UserDto>();
+            CreateMap<UserDto, AuthUser>();
+            CreateMap<UserUpdateDto, AuthUser>();
+            CreateMap<UserRegisteredDto, AuthUser>();
+            CreateMap<AuthUser, UserRegisteredDto>();
+            CreateMap<UserRegistrationDto, AuthUser>();
+            CreateMap<UserAuthenticationDto, AuthUser>();
+            CreateMap<AuthUser, UserAuthenticatedDto>();
         }
     }
 }

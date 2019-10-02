@@ -24,16 +24,16 @@ namespace Application.Controllers
     [Route("api/[controller]")]
     public class AuthenticationController : ControllerBase
     {
-        private readonly IUserService _userService;
-        private readonly IUserRepository _userRepository;
+        private readonly IAuthenticationService _authenticationService;
+        private readonly IAuthenticationRepository _authenticationRepository;
         private readonly IMapper _mapper;
         private AppSettings _appSettings;
 
-        public AuthenticationController(IUserService userService, IUserRepository userRepository, IMapper mapper,
+        public AuthenticationController(IAuthenticationService authenticationService, IAuthenticationRepository authenticationRepository, IMapper mapper,
             IOptions<AppSettings> appSettings)
         {
-            _userService = userService;
-            _userRepository = userRepository;
+            _authenticationService = authenticationService;
+            _authenticationRepository = authenticationRepository;
             _mapper = mapper;
             _appSettings = appSettings.Value;
         }
@@ -48,7 +48,7 @@ namespace Application.Controllers
 
             try
             {
-                var user = _userService.Authenticate(userDto.Email, userDto.Password);
+                var user = _authenticationService.Authenticate(userDto.Email, userDto.Password);
 
                 if (user == null)
                     return BadRequest(new {message = "Username or password is incorrect"});
@@ -91,12 +91,12 @@ namespace Application.Controllers
 
             try
             {
-                var user = _mapper.Map<User>(userDto);
+                var user = _mapper.Map<AuthUser>(userDto);
 
-                string id = await _userService.RegisterUser(userDto.Email, userDto.FirstName, userDto.LastName);
+                string id = await _authenticationService.RegisterUser(userDto.Email, userDto.FirstName, userDto.LastName);
                 user.Id = id;
 
-                var createdUser = _userService.Create(user, userDto.Password);
+                var createdUser = _authenticationService.Create(user, userDto.Password);
                 var createdUserDto = _mapper.Map<UserRegisteredDto>(createdUser);
                 return Ok(createdUserDto);
             }
@@ -111,7 +111,7 @@ namespace Application.Controllers
         {
             try
             {
-                var user = _userRepository.GetById(id);
+                var user = _authenticationRepository.GetById(id);
                 var userDto = _mapper.Map<UserDto>(user);
                 return Ok(userDto);
             }
@@ -131,10 +131,10 @@ namespace Application.Controllers
 
             try
             {
-                var user = _mapper.Map<User>(userDto);
+                var user = _mapper.Map<AuthUser>(userDto);
                 user.Id = id;
 
-                _userService.Update(user, userDto.Password);
+                _authenticationService.Update(user, userDto.Password);
                 return Ok();
             }
             catch (Exception e)
@@ -148,7 +148,7 @@ namespace Application.Controllers
         {
             try
             {
-                _userRepository.Remove(id);
+                _authenticationRepository.Remove(id);
 
                 return Ok();
             }
