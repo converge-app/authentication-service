@@ -51,7 +51,6 @@ namespace Application
             services.AddMultipleDomainSupport();
 
             var appSettings = Settings.GetAppSettings(services, Configuration);
-            services.AddTokenValidation(appSettings.Secret);
             var key = Encoding.UTF8.GetBytes(appSettings.Secret);
 
             services.AddHttpClient<IUserService, UserService>("UserService")
