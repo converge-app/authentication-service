@@ -89,7 +89,7 @@ namespace Application.Services
         {
             var client  = _httpClientFactory.CreateClient("UsersService");
             var host = Environment.GetEnvironmentVariable("USERS_SERVICE_HTTP");
-            var uri = $"https://{host}/api/users";
+            var uri = $"http://{host}/api/users";
             var content = new {FirstName = firstName, LastName = lastName, Email = email};
             var response = await client.PostAsJsonAsync(uri, content);
 
