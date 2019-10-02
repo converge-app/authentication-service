@@ -1,19 +1,25 @@
 using System;
+using System.Text;
+using System.Threading.Tasks;
 using Application.Database;
 using Application.Helpers;
 using Application.Repositories;
 using Application.Services;
 using Application.Utility.Database;
 using Application.Utility.Middleware;
+using Application.Utility.Models;
 using Application.Utility.Startup;
 using AutoMapper;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
+using Polly;
 using Prometheus;
 
 namespace Application
@@ -61,12 +67,53 @@ namespace Application
 
             services.AddMultipleDomainSupport();
 
-            var appSettings = Settings.GetAppSettings(services, Configuration);
-            services.AddTokenValidation(appSettings.Secret);
+            services.AddHttpClient<IUserService, UserService>("UserService")
+                .AddTransientHttpErrorPolicy(
+                    p => p.WaitAndRetryAsync(
+                        3, _ => TimeSpan.FromMilliseconds(600)
+                    )
+                );
+
+            services.GetAppSettings(Configuration);
+            var appSettings = Configuration.GetSection("AppSettings").Get<AppSettings>();
+            var key = Encoding.UTF8.GetBytes(appSettings.Secret);
+
+            services.AddAuthentication(x =>
+                {
+                    x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                    x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                })
+                .AddJwtBearer(x =>
+                {
+                    x.Events = new JwtBearerEvents()
+                    {
+                        OnTokenValidated = context =>
+                        {
+                            var userRepository =
+                                context.HttpContext.RequestServices.GetRequiredService<IUserRepository>();
+                            var userId = context.Principal.Identity.Name;
+                            var user = userRepository.GetById(userId);
+                            if (user == null) context.Fail("Unauthorized");
+
+                            return Task.CompletedTask;
+                        }
+                    };
+                    x.RequireHttpsMetadata = false;
+                    x.SaveToken = true;
+                    x.TokenValidationParameters = new TokenValidationParameters()
+                    {
+                        ValidateIssuerSigningKey = true,
+                        IssuerSigningKey = new SymmetricSecurityKey(key),
+                        ValidateAudience = true,
+                        ValidAudience = "auth",
+                        ValidateIssuer = false
+                    };
+                });
+
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IUserService, UserService>();
 
-            services.AddApiDocumentation("User");
+            services.AddApiDocumentation("Authentication");
 
             services.AddHealthChecks();
         }
@@ -81,7 +128,7 @@ namespace Application
             app.UseRequestMiddleware();
 
             app.UseAuthentication();
-            app.UseApiDocumentation("User");
+            app.UseApiDocumentation("Authentication");
 
             app.UseMvc();
         }

@@ -5,6 +5,6 @@ docker run --rm \
 -e MONGO_INITDB_ROOT_USERNAME=admin \
 -e MONGO_INITDB_ROOT_PASSWORD=password \
 -e MONGO_INITDB_DATABASE=ApplicationDb \
--v "/home/hermansen/Documents/git/converge/users-service/mongodb:/docker-entrypoint-initdb.d/" \
+-v "/home/hermansen/Documents/git/converge/services/authentication-service/mongodb:/docker-entrypoint-initdb.d/" \
 --name mongodb mongo
 

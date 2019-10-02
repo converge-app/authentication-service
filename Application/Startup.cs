@@ -20,6 +20,7 @@ using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using Prometheus;
 using Application.Utility.Database;
+using Application.Utility.Models;
 using Polly;
 
 namespace Application
@@ -31,6 +32,7 @@ namespace Application
             Configuration = configuration;
             Logging.CreateLogger();
         }
+
         public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
@@ -50,7 +52,8 @@ namespace Application
 
             services.AddMultipleDomainSupport();
 
-            var appSettings = Settings.GetAppSettings(services, Configuration);
+            services.GetAppSettings(Configuration);
+            var appSettings = Configuration.GetSection("AppSettings").Get<AppSettings>();
             var key = Encoding.UTF8.GetBytes(appSettings.Secret);
 
             services.AddHttpClient<IUserService, UserService>("UserService")
@@ -94,7 +97,7 @@ namespace Application
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IUserService, UserService>();
 
-            services.AddApiDocumentation("User");
+            services.AddApiDocumentation("Authentication");
 
             services.AddHealthChecks();
         }
@@ -114,7 +117,7 @@ namespace Application
             app.UseRequestMiddleware();
 
             app.UseAuthentication();
-            app.UseApiDocumentation("User");
+            app.UseApiDocumentation("Authentication");
 
             app.UseMvc();
         }
