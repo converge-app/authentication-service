@@ -27,8 +27,11 @@ namespace Application
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        private readonly ILoggerFactory _loggerFactory;
+
+        public Startup(IConfiguration configuration, ILoggerFactory loggerFactory)
         {
+            _loggerFactory = loggerFactory;
             Configuration = configuration;
             Logging.CreateLogger();
         }
@@ -96,6 +99,12 @@ namespace Application
                 });
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IUserService, UserService>();
+            services.AddTracing(options =>
+            {
+                options.JaegerAgentHost = Environment.GetEnvironmentVariable("JAEGER_AGENT_HOST");
+                options.ServiceName = "authentication-service";
+                options.LoggerFactory = _loggerFactory;
+            });
 
             services.AddApiDocumentation("Authentication");
 
