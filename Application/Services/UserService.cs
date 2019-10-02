@@ -43,10 +43,10 @@ namespace Application.Services
                 return null;
 
             var user = _userRepository.GetByEmail(email) ??
-                       throw new ArgumentNullException("_userRepository.GetByEmail(username)");
+                       throw new Exception("Email or password was incorrect");
             
             if (!VerifyPasswordHash(password, user.CurrentPassword))
-                return null;
+                throw new Exception("Email or password was incorrect");
 
             return user;
         }
