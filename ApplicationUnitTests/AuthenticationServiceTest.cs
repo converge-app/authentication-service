@@ -143,6 +143,41 @@ namespace ApplicationUnitTests
 
         }
 
+        [Fact]
+        public void Update_GetById_ThrowsArgumentNullException()
+        {
+            // Arrange
+            var mockEmail = "test@test.com";
+            var authRepository = new Mock<IAuthenticationRepository>();
+            var httpClientFactory = new Mock<IHttpClientFactory>();
+            authRepository.Setup(m => m.GetByEmail(It.IsAny<string>())).Returns(new AuthUser() { Email = mockEmail, CurrentPassword = "$2b$10$WYLx9JXvzAEjdYyDMMwSPOTRpJrADsWYhQmN2d2JKOG" });
+            authRepository.Setup(m => m.GetById(It.IsAny<string>())).Returns((AuthUser)null);
+            var authService = new AuthenticationService(authRepository.Object, httpClientFactory.Object);
+
+            // Act
+            // Assert
+            Assert.Throws<ArgumentNullException>(() => authService.Update(new AuthUser()));
+
+        }
+
+        /*[Fact]
+        public void Update_GetById_ThrowsException()
+        {
+            // Arrange
+            var mockEmail = "test@test.com";
+            var authRepository = new Mock<IAuthenticationRepository>();
+            var httpClientFactory = new Mock<IHttpClientFactory>();
+            authRepository.Setup(m => m.GetByEmail(It.IsAny<string>())).Returns(new AuthUser() { Email = mockEmail, CurrentPassword = "$2b$10$WYLx9JXvzAEjdYyDMMwSPOTRpJrADsWYhQmN2d2JKOG" });
+            authRepository.Setup(m => m.GetById(It.IsAny<string>())).Returns(new AuthUser() { Email = mockEmail });
+            var authService = new AuthenticationService(authRepository.Object, httpClientFactory.Object);
+
+            // Act
+            // Assert
+            Assert.Throws<Exception>(() => authService.Update(new AuthUser(), "test123455"));
+
+        }*/
+
+
 
     }
 
