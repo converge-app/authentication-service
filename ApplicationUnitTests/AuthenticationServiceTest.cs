@@ -150,7 +150,6 @@ namespace ApplicationUnitTests
             var mockEmail = "test@test.com";
             var authRepository = new Mock<IAuthenticationRepository>();
             var httpClientFactory = new Mock<IHttpClientFactory>();
-            authRepository.Setup(m => m.GetByEmail(It.IsAny<string>())).Returns(new AuthUser() { Email = mockEmail, CurrentPassword = "$2b$10$WYLx9JXvzAEjdYyDMMwSPOTRpJrADsWYhQmN2d2JKOG" });
             authRepository.Setup(m => m.GetById(It.IsAny<string>())).Returns((AuthUser)null);
             var authService = new AuthenticationService(authRepository.Object, httpClientFactory.Object);
 
@@ -160,22 +159,40 @@ namespace ApplicationUnitTests
 
         }
 
-        /*[Fact]
-        public void Update_GetById_ThrowsException()
+        [Fact]
+        public void Update_GetById_UserAlreadyInTheSystem_Throws()
         {
             // Arrange
             var mockEmail = "test@test.com";
             var authRepository = new Mock<IAuthenticationRepository>();
             var httpClientFactory = new Mock<IHttpClientFactory>();
-            authRepository.Setup(m => m.GetByEmail(It.IsAny<string>())).Returns(new AuthUser() { Email = mockEmail, CurrentPassword = "$2b$10$WYLx9JXvzAEjdYyDMMwSPOTRpJrADsWYhQmN2d2JKOG" });
-            authRepository.Setup(m => m.GetById(It.IsAny<string>())).Returns(new AuthUser() { Email = mockEmail });
+            authRepository.Setup(m => m.GetById(It.IsAny<string>())).Returns(new AuthUser() { Id = "12" });
             var authService = new AuthenticationService(authRepository.Object, httpClientFactory.Object);
 
             // Act
             // Assert
-            Assert.Throws<Exception>(() => authService.Update(new AuthUser(), "test123455"));
+            Assert.Throws<Exception>(() => authService.Update(new AuthUser()));
 
-        }*/
+        }
+
+
+        [Fact]
+        public void Update_GetById_ReturnsUpdateAuth()
+        {
+            // Arrange
+            var authRepository = new Mock<IAuthenticationRepository>();
+            var httpClientFactory = new Mock<IHttpClientFactory>();
+            authRepository.Setup(m => m.GetById(It.IsAny<string>())).Returns(new AuthUser());
+            authRepository.Setup(m => m.Create(It.IsAny<AuthUser>())).Returns<AuthUser>(x => x);
+            var authService = new AuthenticationService(authRepository.Object, httpClientFactory.Object);
+
+            // Act
+            authService.Update(new AuthUser(), "Test1234");
+
+            // Assert
+
+
+        }
 
 
 

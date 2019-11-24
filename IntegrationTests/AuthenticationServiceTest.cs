@@ -120,29 +120,29 @@ namespace ApplicationUnitTests
         }
 
 
-        [Fact]
-        public async Task Get_AuthenticationById()
-        {
+        /* [Fact]
+         public async Task Get_AuthenticationById()
+         {
 
-            // Arrange
-            Environment.SetEnvironmentVariable("USERS_SERVICE_HTTP", "users-service.api.converge-app.net");
+             // Arrange
+             Environment.SetEnvironmentVariable("USERS_SERVICE_HTTP", "users-service.api.converge-app.net");
 
-            var client = _factory.CreateClient();
+             var client = _factory.CreateClient();
 
-            UserAuthenticationDto authUser = new UserAuthenticationDto
-            {
-                Email = "test18@gmail.com",
-                Password = "samir1234"
-            };
+             UserAuthenticationDto authUser = new UserAuthenticationDto
+             {
+                 Email = "test18@gmail.com",
+                 Password = "samir1234"
+             };
 
-            // Act
-            //Assert
-            var response = await client.GetAsync("/api/Authentication/5dd7a0d9891672000148c24b");
+             // Act
+             //Assert
+             var response = await client.GetAsync("/api/Authentication/5dd7a0d9891672000148c24b");
 
-            var actual = await response.Content.ReadAsStringAsync();
-            Assert.NotNull(actual);
+             var actual = await response.Content.ReadAsStringAsync();
+             Assert.NotNull(actual);
 
-        }
+         }*/
 
 
         [Fact]
@@ -154,20 +154,34 @@ namespace ApplicationUnitTests
 
             var client = _factory.CreateClient();
 
+            UserRegistrationDto user = new UserRegistrationDto
+            {
+                FirstName = Guid.NewGuid().ToString(),
+                LastName = Guid.NewGuid().ToString(),
+                Email = Guid.NewGuid().ToString() + "test@gmail.com",
+                Password = Guid.NewGuid().ToString()
+            };
+
+            var response = await client.PostAsJsonAsync("/api/authentication/register", user);
+            if (!response.IsSuccessStatusCode)
+            {
+                throw new Exception(await response.Content.ReadAsStringAsync());
+            }
+
             UserAuthenticationDto authUser = new UserAuthenticationDto
             {
-                Email = "test18@gmail.com",
-                Password = "samir1234"
+                Email = user.Email,
+                Password = user.Password
             };
 
             // Act
-            //Assert
-            var response = await client.PutAsJsonAsync("/api/Authentication/5dd7a0d9891672000148c24b", new UserUpdateDto
-            {
-                Id = "5dd7a0d9891672000148c24b",
-                Password = "Martingsahs"
-            });
+            response = await client.PostAsJsonAsync("/api/authentication/authenticate", user);
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", authorizationToken);
 
+
+            // Act
+            //Assert
+            response = await client.PutAsJsonAsync("/api/Authentication/5dd7a0d9891672000148c24b", authUser);
             var actual = await response.Content.ReadAsStringAsync();
             Assert.NotNull(actual);
 
