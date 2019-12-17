@@ -1,0 +1,6 @@
+@startuml
+class UserRegisteredDto {
+    + Id : string <<get>> <<set>>
+    + Email : string <<get>> <<set>>
+}
+@enduml

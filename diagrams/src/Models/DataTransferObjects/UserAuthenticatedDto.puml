@@ -1,0 +1,6 @@
+@startuml
+class UserAuthenticatedDto {
+    + Id : string <<get>> <<set>>
+    + Token : string <<get>> <<set>>
+}
+@enduml

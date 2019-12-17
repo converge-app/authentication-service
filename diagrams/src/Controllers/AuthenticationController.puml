@@ -1,0 +1,15 @@
+@startuml
+class AuthenticationController {
+    - <<readonly>> _authenticationService : IAuthenticationService
+    - <<readonly>> _authenticationRepository : IAuthenticationRepository
+    - <<readonly>> _mapper : IMapper
+    - _appSettings : AppSettings
+    + AuthenticationController(authenticationService:IAuthenticationService, authenticationRepository:IAuthenticationRepository, mapper:IMapper, appSettings:IOptions<AppSettings>)
+    + Authenticate(userDto:UserAuthenticationDto) : IActionResult
+    + <<async>> Register(userDto:UserRegistrationDto) : Task<IActionResult>
+    + GetById(id:string) : IActionResult
+    + Update(id:string, userDto:UserUpdateDto) : IActionResult
+    + Delete(id:string) : IActionResult
+}
+ControllerBase <|-- AuthenticationController
+@enduml

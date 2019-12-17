@@ -1,0 +1,6 @@
+@startuml
+class UserDto {
+    + Email : string <<get>> <<set>>
+    + Id : string <<get>> <<set>>
+}
+@enduml

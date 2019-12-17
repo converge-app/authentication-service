@@ -1,0 +1,20 @@
+@startuml
+interface IAuthenticationService {
+    Authenticate(email:string, password:string) : AuthUser
+    Create(user:AuthUser, password:string) : AuthUser
+    Update(userParam:AuthUser, password:string) : void
+    RegisterUser(email:string, firstName:string, lastName:string) : Task<string>
+}
+class AuthenticationService {
+    - <<readonly>> _userRepository : IAuthenticationRepository
+    - <<readonly>> _httpClientFactory : IHttpClientFactory
+    + AuthenticationService(authenticationRepository:IAuthenticationRepository, httpClientFactory:IHttpClientFactory)
+    + Authenticate(email:string, password:string) : AuthUser
+    + Create(user:AuthUser, password:string) : AuthUser
+    + Update(userParam:AuthUser, password:string) : void
+    + <<async>> RegisterUser(email:string, firstName:string, lastName:string) : Task<string>
+    - {static} CreatePasswordHash(password:string, passwordHash:string) : void
+    - {static} VerifyPasswordHash(password:string, storedHash:string) : bool
+}
+IAuthenticationService <|-- AuthenticationService
+@enduml

@@ -1,0 +1,9 @@
+@startuml
+class Startup {
+    - <<readonly>> _loggerFactory : ILoggerFactory
+    + Startup(configuration:IConfiguration, loggerFactory:ILoggerFactory)
+    + Configuration : IConfiguration <<get>>
+    + ConfigureServices(services:IServiceCollection) : void
+    + Configure(app:IApplicationBuilder, env:IHostingEnvironment, loggerFactory:ILoggerFactory) : void
+}
+@enduml

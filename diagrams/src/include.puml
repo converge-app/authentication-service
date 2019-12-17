@@ -1,0 +1,18 @@
+@startuml
+!include ./Application/Startup.puml
+!include ./Application/StartupDevelopment.puml
+!include ./Application/Program.puml
+!include ./Helpers/AutoMapperProfile.puml
+!include ./Services/AuthenticationService.puml
+!include ./Database/DatabaseContext.puml
+!include ./Controllers/AuthenticationController.puml
+!include ./Controllers/HealthController.puml
+!include ./Repositories/AuthenticationRepository.puml
+!include ./Models/Entities/AuthUser.puml
+!include ./Models/DataTransferObjects/UserRegisteredDto.puml
+!include ./Models/DataTransferObjects/UserUpdateDto.puml
+!include ./Models/DataTransferObjects/UserDto.puml
+!include ./Models/DataTransferObjects/UserAuthenticatedDto.puml
+!include ./Models/DataTransferObjects/UserAuthenticationDto.puml
+!include ./Models/DataTransferObjects/UserRegistrationDto.puml
+@enduml

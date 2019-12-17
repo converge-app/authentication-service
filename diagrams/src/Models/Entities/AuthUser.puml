@@ -1,0 +1,8 @@
+@startuml
+class AuthUser {
+    + Id : string <<get>> <<set>>
+    + Email : string <<get>> <<set>>
+    + CurrentPassword : string <<get>> <<set>>
+    + Passwords : List<string> <<get>> <<set>>
+}
+@enduml

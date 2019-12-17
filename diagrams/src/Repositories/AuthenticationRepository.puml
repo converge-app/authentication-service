@@ -1,0 +1,24 @@
+@startuml
+interface IAuthenticationRepository {
+    Get() : List<AuthUser>
+    GetById(id:string) : AuthUser
+    Create(authUser:AuthUser) : AuthUser
+    Update(id:string, authUserIn:AuthUser) : void
+    Remove(authUserIn:AuthUser) : void
+    Remove(id:string) : void
+    GetByEmail(email:string) : AuthUser
+}
+class AuthenticationRepository {
+    - <<readonly>> dbContext : IDatabaseContext
+    - _authUsers : IMongoCollection<AuthUser>
+    + AuthenticationRepository(dbContext:IDatabaseContext)
+    + Get() : List<AuthUser>
+    + GetById(id:string) : AuthUser
+    + GetByEmail(email:string) : AuthUser
+    + Create(authUser:AuthUser) : AuthUser
+    + Update(id:string, authUserIn:AuthUser) : void
+    + Remove(authUserIn:AuthUser) : void
+    + Remove(id:string) : void
+}
+IAuthenticationRepository <|-- AuthenticationRepository
+@enduml
